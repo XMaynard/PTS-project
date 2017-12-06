@@ -1,12 +1,15 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('./../server');
 const {Sale} = require('./../models/sale');
 
 const sale = [{
+    _id: new ObjectID(),
     counterParty: 'CounterParty Test'
 }, {
+    _id: new ObjectID(),
     counterParty: 'CounterParty Test',
     exchangeLocation: 'Location Test',
     typeOfCommodity: 'Commodity Test'
@@ -64,9 +67,7 @@ describe('POST /sale', () => {
             }).catch((e) => done(e));
         });      
     });
-});
-
-describe('POST /sale', () => {
+    
    it('should create a new sale record with location', (done) =>{
        
        let counterParty = "Encana";
@@ -97,10 +98,11 @@ describe('POST /sale', () => {
               done();
           }).catch((e) => done(e));
       });      
-   }); 
-});
+    });
+  }); 
 
-describe ('GET /sale', () => {
+describe('POST /sale', () => {
+  
     it('should return all sales', (done) => {
         
         request(app)
@@ -110,5 +112,36 @@ describe ('GET /sale', () => {
             expect(res.body.sale.length).toBe(2);
         })
         .end(done);
+    });    
+});
+
+
+describe ('GET /sale/id', () => {
+     
+    it('should find a sale by its id', (done)=>{
+        
+        request(app)
+        .get(`/sale/${sale[0]._id.toHexString()}`)
+        .expect(200)
+        .expect((res) =>{
+            expect(res.body.sale.counterParty).toBe(sale[0].counterParty);
+        })
+        .end(done);
     });
+    
+    it('should return a 404 if sale not found', (done) => {
+        let hexId = new ObjectID().toHexString();
+        
+        request(app)
+        .get(`/sale/${hexId}`)
+        .expect(404)
+        .end(done);
+    });
+    it('should return a 404 if id is not valid', (done) =>{
+        request(app)
+        .get('/sale/123lsfs2424')
+        .expect(404)
+        .end(done);
+    })
+    
 });
