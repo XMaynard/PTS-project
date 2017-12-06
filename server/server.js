@@ -48,16 +48,29 @@ app.get('/sale/:id', (req, res) =>{
     Sale.findById(id).then((sale) => {
         if(!sale){
             return res.status(404).send();
-        }
-        
-        res.send({sale});
-        
+        }  
+        res.send({sale});  
     }).catch((e) =>{
         res.status(400).send();
     });
-  
 });
 
+app.delete('/sale/:id', (req, res) =>{
+    let id = req.params.id;
+    
+    if(!ObjectID.isValid(id)){
+        return res.status(400).send();
+    }
+    
+    Sale.findByIdAndRemove(id).then((sale) =>{
+        if(!sale){
+            return res.status(404).send();
+        }
+        res.send({sale})
+    }).catch((e) =>{
+        return res.status(400).send();
+    });
+});
 
 app.listen(3000, () => {
     console.log('Started on port 3000');
