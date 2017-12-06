@@ -1,5 +1,6 @@
 let express = require('express');
 let bodyParser = require('body-parser');
+let {ObjectID} = require('mongodb');
 
 let {mongoose} = require('./db/mongoose');
 
@@ -35,6 +36,26 @@ app.get('/sale', (req, res) =>{
     }, (e) =>{
         res.status(400).send(e);
     });
+});
+
+app.get('/sale/:id', (req, res) =>{
+    let id = req.params.id;
+    
+    if(!ObjectID.isValid(id)){
+        return res.status(404).send();
+    }
+    
+    Sale.findById(id).then((sale) => {
+        if(!sale){
+            return res.status(404).send();
+        }
+        
+        res.send({sale});
+        
+    }).catch((e) =>{
+        res.status(400).send();
+    });
+  
 });
 
 
