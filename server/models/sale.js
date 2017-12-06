@@ -2,9 +2,11 @@ let mongoose = require('mongoose');
 
 let Sale = mongoose.model('Sale', {
    
-    transactionDate:{
+    transactionDate: {
        type: Date,
-        required: true   
+        required: true, 
+        minlength: 1,
+        trim: true
     },
     settlementDate: {
       type: Date,  
@@ -12,26 +14,26 @@ let Sale = mongoose.model('Sale', {
     },
     counterParty: {
         type: String,
-        required: true,
+        required: false,
         minlength: 1,
         trim: true
 },
     typeOfCommodity: {
         type: String,
-        required: true,
+        required: false,
         minlength: 1,
         trim: true
     },
     exchangeLocation: {
        type: String,
-        required: true,
+        required: false,
         minlength: 1,
         trim: true
     },
     
     volume: {
         type: Number,
-        required: true,
+        required: false,
         minlength: 1,
         trim: true
     },
@@ -45,6 +47,7 @@ let Sale = mongoose.model('Sale', {
         type: Number,
         default: null
     }
+    
 });
 
 module.exports = {Sale};
