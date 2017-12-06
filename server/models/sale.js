@@ -4,17 +4,17 @@ let Sale = mongoose.model('Sale', {
    
     transactionDate: {
        type: Date,
-        required: true, 
+        required: false, 
         minlength: 1,
         trim: true
     },
     settlementDate: {
       type: Date,  
-        required: true
+        required: false
     },
     counterParty: {
         type: String,
-        required: false,
+        required: true,
         minlength: 1,
         trim: true
 },
@@ -39,7 +39,7 @@ let Sale = mongoose.model('Sale', {
     },
    price: {
         type: Number,
-       required: true,
+       required: false,
         minlength: 1,
         trim: true
 },
