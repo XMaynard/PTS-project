@@ -143,5 +143,43 @@ describe ('GET /sale/id', () => {
         .expect(404)
         .end(done);
     })
+});
+
+describe('DELETE /sale/:id', () =>{
     
+     it('should remove a sale', (done) => {
+         let hexId = sale[1]._id.toHexString();
+         
+         request(app)
+         .delete(`/sale/${hexId}`)
+         .expect(200)
+         .expect((res) =>{
+             expect(res.body.sale._id).toBe(hexId);
+         })
+         .end((err, res) => {
+            if(err){
+                return done(err);
+            } 
+             
+             Sale.findById(hexId).then((sale) => {
+                 expect(sale).toBeFalsy();
+                 done();
+             }).catch((e) => done(e));
+            });
+        });
+    
+    it('should return a 404 if no item found', (done) =>{
+            hexId = new ObjectID().toHexString();
+        request(app)
+        .delete(`/sale/${hexId}`)
+        .expect(404)
+        .end(done);
+    });
+    
+    it('should return 404 if id is invalid', (done) =>{
+        request(app)
+        .delete('/sale/123lsfs2424')
+        .expect(404)
+        .end(done);
+    }); 
 });
