@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const expect = require('expect');
 const request = require('supertest');
 const {ObjectID} = require('mongodb');
@@ -7,12 +8,17 @@ const {Sale} = require('./../models/sale');
 
 const sale = [{
     _id: new ObjectID(),
-    counterParty: 'CounterParty Test'
+    counterParty: 'Suncor',
+    exchangeLocation: 'Edmonton',
+    typeOfCommodity: 'WCS'
+    
 }, {
     _id: new ObjectID(),
-    counterParty: 'CounterParty Test',
-    exchangeLocation: 'Location Test',
-    typeOfCommodity: 'Commodity Test'
+    counterParty: 'TCPL',
+    exchangeLocation: 'Hardisty',
+    typeOfCommodity: 'CLB',
+    completed: true,
+    completedAt: 333
 }]
 
 beforeEach((done)=> {
@@ -23,20 +29,23 @@ beforeEach((done)=> {
 
 describe('POST /sale', () => {
    it('should create a new sale record', (done) =>{
- //     let transactionDate = "11/30/2017";
-//      let settlementDate = "12/25/2017";
-      let counterParty = "Suncor";
-//     let typeOfCommodity =  "CLB";
-//      let exchangeLocation = "Edmonton";
- //     let volume = '200000';
+
+      let counterParty = "Husky";
+      let typeOfCommodity =  "CLB";
+      let exchangeLocation = "Edmonton";
+//      let volume = '200000';
 //      let price = '55.60';
      
       request(app)
        .post('/sale')
        .send({counterParty})
+       .send({typeOfCommodity})
+       .send({exchangeLocation})
        .expect(200)
        .expect((res)=>{
           expect(res.body.counterParty).toBe(counterParty);
+          expect(res.body.typeOfCommodity).toBe(typeOfCommodity);
+          expect(res.body.exchangeLocation).toBe(exchangeLocation);
       })    
      .end((err, res) =>{
           if(err){
@@ -99,10 +108,7 @@ describe('POST /sale', () => {
           }).catch((e) => done(e));
       });      
     });
-  }); 
-
-describe('POST /sale', () => {
-  
+    
     it('should return all sales', (done) => {
         
         request(app)
@@ -112,8 +118,14 @@ describe('POST /sale', () => {
             expect(res.body.sale.length).toBe(2);
         })
         .end(done);
-    });    
-});
+    });
+    
+  }); 
+
+//describe('POST /sale', () => {
+//  
+//      
+//});
 
 
 describe ('GET /sale/id', () => {
@@ -143,6 +155,32 @@ describe ('GET /sale/id', () => {
         .expect(404)
         .end(done);
     })
+    
+    it('should return all sale at a location', (done) =>{
+        let location = 'Hardisty';
+        request(app)
+        .get(`/location/${location}`)
+        .expect(200)
+        .expect((res) =>{
+            expect(sale[1].exchangeLocation).toBe(location)
+        })
+        .end(done);
+    })
+    
+    it('should not return 404 if location does not exist', (done) =>{
+        let location = " ";
+        request(app)
+        .get(`/location/${location}`)
+        .expect(404)
+        .expect((res) =>{
+            expect(sale[1].exchangeLocation).not.toBe(location);
+        })
+        .end(done);
+        
+    });
+    
+    
+    
 });
 
 describe('DELETE /sale/:id', () =>{
@@ -182,4 +220,50 @@ describe('DELETE /sale/:id', () =>{
         .expect(404)
         .end(done);
     }); 
+});
+
+describe('PATCH /sale/:id', () =>{
+    
+    it('should update the sale', (done) =>{
+        
+        let hexId = sale[0]._id.toHexString();
+        
+        let counterParty = "Encana";
+        let completed = true;
+        
+//        if(!ObjectID.isValid(hexId)){
+//            return res.status(404).send();
+//        }    
+        
+        request(app)
+        .patch(`/sale/${hexId}`)
+        .send({
+            counterParty,
+            completed
+        })
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.sale.counterParty).toBe(counterParty);
+            expect(res.body.sale.completed).toBe(true);
+            expect(typeof res.body.sale.completedAt).toBe('number');
+       })
+        .end(done);
+    });
+    
+    it('should clear completedAt when sale is not completed', (done) =>{
+        let hexId = sale[1]._id.toHexString();
+        let completed = false;
+        
+        request(app)
+        .patch(`/sale/${hexId}`)
+        .send({
+            completed
+        })
+        .expect(200)
+        .expect((res) => {
+            expect(res.body.sale.completedAt).toBe(null);
+        })
+        .end(done);
+        
+    });
 });

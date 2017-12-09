@@ -4,6 +4,7 @@ let Sale = mongoose.model('Sale', {
    
     transactionDate: {
        type: Date,
+        default: new Date().getTime(),
         required: false, 
         minlength: 1,
         trim: true
@@ -20,13 +21,13 @@ let Sale = mongoose.model('Sale', {
 },
     typeOfCommodity: {
         type: String,
-        required: false,
+        required: true,
         minlength: 1,
         trim: true
     },
     exchangeLocation: {
        type: String,
-        required: false,
+        required: true,
         minlength: 1,
         trim: true
     },
@@ -43,11 +44,15 @@ let Sale = mongoose.model('Sale', {
         minlength: 1,
         trim: true
 },
+  completed:{
+        type: Boolean,
+        default: false
+    },
     completedAt: {
         type: Number,
         default: null
     }
-    
 });
 
+`   `
 module.exports = {Sale};
