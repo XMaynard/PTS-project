@@ -33,12 +33,12 @@ app.get('/', (req, res) =>{
 app.post("/addname", (req, res)=>{
     let user = new Users(req.body);
     console.log(user);
+    
     user.save().then() => {
         res.send('item saved to database');
     }).catch(err => {
         res.status(400).send('Unable to save to database');
     });
-    
     
 });
 

@@ -54,5 +54,5 @@ let Sale = mongoose.model('Sale', {
     }
 });
 
-`   `
+
 module.exports = {Sale};
